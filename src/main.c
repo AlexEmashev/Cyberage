@@ -6,7 +6,6 @@ GFont s_orbitron_font_36;
 GFont s_orbitron_font_24;
 GFont s_orbitron_font_20;
 static Window *window;
-static TextLayer  *minutes_layer, *seconds_layer;
 static TextLayer *date_layer;
 // Time text layers
 static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minutes_2nd_layer, *seconds_1st_layer, *seconds_2nd_layer;
@@ -155,12 +154,19 @@ void init_time_layer(TextLayer *txt_layer){
 void deinit(void){
   // Destroy the text layer
   text_layer_destroy(hours_1st_layer);
+  text_layer_destroy(hours_2nd_layer);
+  text_layer_destroy(minutes_1st_layer);
+  text_layer_destroy(minutes_2nd_layer);
+  text_layer_destroy(seconds_1st_layer);
+  text_layer_destroy(seconds_2nd_layer);
+  text_layer_destroy(date_layer);
+  gbitmap_destroy(s_time_angles_bmp);
+  gbitmap_destroy(s_seconds_arows_bmp);
+  bitmap_layer_destroy(s_time_angles_layer);
+  bitmap_layer_destroy(s_seconds_arows_layer);
   
   // Destroy the window
   window_destroy(window);
-  
-  // Destroy date layer
-  text_layer_destroy(date_layer);
 }
 
 int main(void){
