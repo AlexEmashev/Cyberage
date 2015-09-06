@@ -21,7 +21,6 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   // TimeUnits to redraw just part of screen
   // Buffer where we write time
   static char time_buffer[17];
-  static char date_buffer[10];
   
   // Get time in format "hh:mm:ss dd.mm w"
   strftime(time_buffer, sizeof(time_buffer), "%H:%M:%S %d.%m %w", tick_time);
@@ -73,6 +72,51 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   //month_2nd_digit[0] = '8';
   month_2nd_digit[1] = '\0';
   
+  static char day_of_week_id[2];
+  day_of_week_id[0] = time_buffer[15];
+  static char day_of_week[3];
+    
+  switch (day_of_week_id[0]){
+    case '0':
+    {
+      strcpy(day_of_week, "SA");
+      break;
+    }
+    case '1':
+    {
+      strcpy(day_of_week, "MO");
+      break;
+    }
+    case '2':
+    {
+      strcpy(day_of_week, "TU");
+      break;
+    }
+    case '3':
+    {
+      strcpy(day_of_week, "WE");
+      break;
+    }
+    case '4':
+    {
+      strcpy(day_of_week, "TH");
+      break;
+    }
+    case '5':
+    {
+      strcpy(day_of_week, "FR");
+      break;
+    }
+    case '6':
+    {
+      strcpy(day_of_week, "ST");
+      break;
+    }
+    default:
+     strcpy(day_of_week, "NA");    
+  }
+  
+  
   
   // Draw time
   text_layer_set_text(hours_1st_layer, hours_1st_digit);
@@ -87,6 +131,7 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   text_layer_set_text(day_2nd_layer, day_2nd_digit);
   text_layer_set_text(month_1st_layer, month_1st_digit);
   text_layer_set_text(month_2nd_layer, month_2nd_digit);
+  text_layer_set_text(day_of_week_layer, day_of_week);
 }
 
 // Program initializer
@@ -164,6 +209,11 @@ void init(void){
   init_time_layer(month_2nd_layer);
   text_layer_set_font(month_2nd_layer, s_orbitron_font_20);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(month_2nd_layer));
+  
+  day_of_week_layer = text_layer_create(GRect(96, 140, 36, 22));
+  init_time_layer(day_of_week_layer);
+  text_layer_set_font(day_of_week_layer, s_orbitron_font_20);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(day_of_week_layer));
     
   // To launch time changing handler
   time_t now = time(NULL);
@@ -199,6 +249,7 @@ void deinit(void){
   text_layer_destroy(day_2nd_layer);
   text_layer_destroy(month_1st_layer);
   text_layer_destroy(month_2nd_layer);
+  text_layer_destroy(day_of_week_layer);
   
   // Destroy graphics
   gbitmap_destroy(s_time_angles_bmp);
