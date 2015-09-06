@@ -7,7 +7,29 @@
     "longName": "Cyberage",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "file": "images/time-angles.png",
+                "name": "IMAGE_TIME_ANGLES",
+                "type": "png"
+            },
+            {
+                "characterRegex": "[0-9]",
+                "file": "fonts/orbitron-light.ttf",
+                "name": "FONT_ORBITRON_LIGHT_36",
+                "type": "font"
+            },
+            {
+                "file": "fonts/orbitron-light.ttf",
+                "name": "FONT_ORBITRON_LIGHT_24",
+                "type": "font"
+            },
+            {
+                "file": "fonts/orbitron-light.ttf",
+                "name": "FONT_ORBITRON_LIGHT_20",
+                "type": "font"
+            }
+        ]
     },
     "sdkVersion": "2",
     "shortName": "Cyberage",
@@ -15,6 +37,6 @@
     "versionCode": 1,
     "versionLabel": "1.0",
     "watchapp": {
-        "watchface": false
+        "watchface": true
     }
 }
