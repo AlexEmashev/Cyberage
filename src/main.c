@@ -13,8 +13,9 @@ static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minute
 // Time angles decorations
 static BitmapLayer *s_time_angles_layer;
 static GBitmap *s_time_angles_bmp;
-
-
+// Seconds arows
+static BitmapLayer *s_seconds_arows_layer;
+static GBitmap *s_seconds_arows_bmp;
 
 void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   // TimeUnits to redraw just part of screen
@@ -41,19 +42,23 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   minutes_2nd_digit[0] = time_buffer[4];
   minutes_2nd_digit[1] = '\0';
   
-//   static char seconds_1st_digit[2];
-//   seconds_1st_digit[0] = time_buffer[5];
-//   seconds_1st_digit[1] = '\0';
+  static char seconds_1st_digit[2];
+  seconds_1st_digit[0] = time_buffer[6];
+  //seconds_1st_digit[0] = '8';
+  seconds_1st_digit[1] = '\0';
   
-//   static char seconds_2nd_digit[2];
-//   seconds_2nd_digit[0] = time_buffer[6];
-//   seconds_2nd_digit[1] = '\0';
+  static char seconds_2nd_digit[2];
+  seconds_2nd_digit[0] = time_buffer[7];
+  //seconds_2nd_digit[0] = '8';
+  seconds_2nd_digit[1] = '\0';
   
   // Draw time
   text_layer_set_text(hours_1st_layer, hours_1st_digit);
   text_layer_set_text(hours_2nd_layer, hours_2nd_digit);
   text_layer_set_text(minutes_1st_layer, minutes_1st_digit);
   text_layer_set_text(minutes_2nd_layer, minutes_2nd_digit);
+  text_layer_set_text(seconds_1st_layer, seconds_1st_digit);
+  text_layer_set_text(seconds_2nd_layer, seconds_2nd_digit);
 
   
   // Drawing date.
@@ -73,7 +78,13 @@ void init(void){
   
   // Initialize time angles decorations
   s_time_angles_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_TIME_ANGLES);
-  s_time_angles_layer = bitmap_layer_create(GRect(0, 54, 144, 38));
+  s_seconds_arows_layer = bitmap_layer_create(GRect(0, 54, 144, 38));
+  bitmap_layer_set_bitmap(s_seconds_arows_layer, s_time_angles_bmp);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_seconds_arows_layer));
+  
+  // Initialize secnods arows decorations
+  s_time_angles_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_SECOND_AROWS1);
+  s_time_angles_layer = bitmap_layer_create(GRect(43, 103, 55, 5));
   bitmap_layer_set_bitmap(s_time_angles_layer, s_time_angles_bmp);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_time_angles_layer));
   
@@ -98,6 +109,17 @@ void init(void){
   init_time_layer(minutes_2nd_layer);
   text_layer_set_font(minutes_2nd_layer, s_orbitron_font_36);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minutes_2nd_layer));
+  
+  // Setup seconds layers
+  seconds_1st_layer = text_layer_create(GRect(51, 93, 18, 20));
+  init_time_layer(seconds_1st_layer);
+  text_layer_set_font(seconds_1st_layer, s_orbitron_font_20);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(seconds_1st_layer));
+  
+  seconds_2nd_layer = text_layer_create(GRect(69, 93, 18, 20));
+  init_time_layer(seconds_2nd_layer);
+  text_layer_set_font(seconds_2nd_layer, s_orbitron_font_20);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(seconds_2nd_layer));
 
   
   // Initialize date layer
@@ -127,7 +149,6 @@ void init(void){
 void init_time_layer(TextLayer *txt_layer){
   text_layer_set_background_color(txt_layer, GColorClear);
   text_layer_set_text_color(txt_layer, GColorWhite);
-  
   text_layer_set_text_alignment(txt_layer, GTextAlignmentRight);
 }
 

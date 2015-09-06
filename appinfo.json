@@ -9,6 +9,16 @@
     "resources": {
         "media": [
             {
+                "file": "images/second-arows2.png",
+                "name": "IMAGE_SECOND_AROWS2",
+                "type": "png"
+            },
+            {
+                "file": "images/second-arows1.png",
+                "name": "IMAGE_SECOND_AROWS1",
+                "type": "png"
+            },
+            {
                 "file": "images/time-angles.png",
                 "name": "IMAGE_TIME_ANGLES",
                 "type": "png"
