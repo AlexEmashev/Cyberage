@@ -155,22 +155,22 @@ void init(void){
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_time_angles_layer));
   
   // Setup hours layers
-  init_time_layer(&hours_1st_layer, GRect(4, 50, 32, 36), s_orbitron_font_36);
-  init_time_layer(&hours_2nd_layer, GRect(35, 50, 32, 36), s_orbitron_font_36);
+  init_text_layer(&hours_1st_layer, GRect(4, 50, 32, 36), s_orbitron_font_36);
+  init_text_layer(&hours_2nd_layer, GRect(35, 50, 32, 36), s_orbitron_font_36);
   
-  init_time_layer(&minutes_1st_layer, GRect(75, 50, 32, 36), s_orbitron_font_36);
-  init_time_layer(&minutes_2nd_layer, GRect(105, 50, 32, 36), s_orbitron_font_36);
+  init_text_layer(&minutes_1st_layer, GRect(75, 50, 32, 36), s_orbitron_font_36);
+  init_text_layer(&minutes_2nd_layer, GRect(105, 50, 32, 36), s_orbitron_font_36);
   
-  init_time_layer(&seconds_1st_layer, GRect(53, 93, 18, 20), s_orbitron_font_20);
-  init_time_layer(&seconds_2nd_layer, GRect(71, 93, 18, 20), s_orbitron_font_20);
+  init_text_layer(&seconds_1st_layer, GRect(53, 93, 18, 20), s_orbitron_font_20);
+  init_text_layer(&seconds_2nd_layer, GRect(71, 93, 18, 20), s_orbitron_font_20);
   
-  init_time_layer(&day_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
-  init_time_layer(&day_2nd_layer, GRect(24, 140, 28, 20), s_orbitron_font_20);
+  init_text_layer(&day_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&day_2nd_layer, GRect(24, 140, 28, 20), s_orbitron_font_20);
   
-  init_time_layer(&month_1st_layer, GRect(52, 140, 18, 20), s_orbitron_font_20);
-  init_time_layer(&month_2nd_layer, GRect(70, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&month_1st_layer, GRect(52, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&month_2nd_layer, GRect(70, 140, 18, 20), s_orbitron_font_20);
   
-  init_time_layer(&day_of_week_layer, GRect(97, 140, 36, 22), s_orbitron_font_20);
+  init_text_layer(&day_of_week_layer, GRect(97, 140, 36, 22), s_orbitron_font_20);
 
   // To launch time changing handler
   time_t now = time(NULL);
@@ -187,7 +187,7 @@ void init(void){
 }
 
 // Initialize text layer shorthand
-void init_time_layer(TextLayer **txt_layer, struct GRect grect, GFont font){
+void init_text_layer(TextLayer **txt_layer, struct GRect grect, GFont font){
   *txt_layer = text_layer_create(grect);
   text_layer_set_font(*txt_layer, font);
   text_layer_set_background_color(*txt_layer, GColorClear);
