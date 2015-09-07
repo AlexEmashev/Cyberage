@@ -116,8 +116,6 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
      strcpy(day_of_week, "NA");    
   }
   
-  
-  
   // Draw time
   text_layer_set_text(hours_1st_layer, hours_1st_digit);
   text_layer_set_text(hours_2nd_layer, hours_2nd_digit);
@@ -157,64 +155,23 @@ void init(void){
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_time_angles_layer));
   
   // Setup hours layers
-  hours_1st_layer = text_layer_create(GRect(4, 50, 32, 36));
-  init_time_layer(hours_1st_layer);
-  text_layer_set_font(hours_1st_layer, s_orbitron_font_36);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(hours_1st_layer));
+  init_time_layer(&hours_1st_layer, GRect(4, 50, 32, 36), s_orbitron_font_36);
+  init_time_layer(&hours_2nd_layer, GRect(35, 50, 32, 36), s_orbitron_font_36);
   
-  hours_2nd_layer = text_layer_create(GRect(35, 50, 32, 36));
-  init_time_layer(hours_2nd_layer);
-  text_layer_set_font(hours_2nd_layer, s_orbitron_font_36);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(hours_2nd_layer));
+  init_time_layer(&minutes_1st_layer, GRect(75, 50, 32, 36), s_orbitron_font_36);
+  init_time_layer(&minutes_2nd_layer, GRect(105, 50, 32, 36), s_orbitron_font_36);
   
-  // Setup minutes layers
-  minutes_1st_layer = text_layer_create(GRect(75, 50, 32, 36));
-  init_time_layer(minutes_1st_layer);
-  text_layer_set_font(minutes_1st_layer, s_orbitron_font_36);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(minutes_1st_layer));
+  init_time_layer(&seconds_1st_layer, GRect(53, 93, 18, 20), s_orbitron_font_20);
+  init_time_layer(&seconds_2nd_layer, GRect(71, 93, 18, 20), s_orbitron_font_20);
   
-  minutes_2nd_layer = text_layer_create(GRect(105, 50, 32, 36));
-  init_time_layer(minutes_2nd_layer);
-  text_layer_set_font(minutes_2nd_layer, s_orbitron_font_36);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(minutes_2nd_layer));
+  init_time_layer(&day_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
+  init_time_layer(&day_2nd_layer, GRect(24, 140, 28, 20), s_orbitron_font_20);
   
-  // Setup seconds layers
-  seconds_1st_layer = text_layer_create(GRect(51, 93, 18, 20));
-  init_time_layer(seconds_1st_layer);
-  text_layer_set_font(seconds_1st_layer, s_orbitron_font_20);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(seconds_1st_layer));
+  init_time_layer(&month_1st_layer, GRect(52, 140, 18, 20), s_orbitron_font_20);
+  init_time_layer(&month_2nd_layer, GRect(70, 140, 18, 20), s_orbitron_font_20);
   
-  seconds_2nd_layer = text_layer_create(GRect(69, 93, 18, 20));
-  init_time_layer(seconds_2nd_layer);
-  text_layer_set_font(seconds_2nd_layer, s_orbitron_font_20);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(seconds_2nd_layer));
-  
-  // Setup date layers
-  day_1st_layer = text_layer_create(GRect(6, 140, 18, 20));
-  init_time_layer(day_1st_layer);
-  text_layer_set_font(day_1st_layer, s_orbitron_font_20);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(day_1st_layer));
-  
-  day_2nd_layer = text_layer_create(GRect(24, 140, 28, 20));
-  init_time_layer(day_2nd_layer);
-  text_layer_set_font(day_2nd_layer, s_orbitron_font_20);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(day_2nd_layer));
-  
-  month_1st_layer = text_layer_create(GRect(52, 140, 18, 20));
-  init_time_layer(month_1st_layer);
-  text_layer_set_font(month_1st_layer, s_orbitron_font_20);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(month_1st_layer));
-  
-  month_2nd_layer = text_layer_create(GRect(70, 140, 18, 20));
-  init_time_layer(month_2nd_layer);
-  text_layer_set_font(month_2nd_layer, s_orbitron_font_20);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(month_2nd_layer));
-  
-  day_of_week_layer = text_layer_create(GRect(96, 140, 36, 22));
-  init_time_layer(day_of_week_layer);
-  text_layer_set_font(day_of_week_layer, s_orbitron_font_20);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(day_of_week_layer));
-    
+  init_time_layer(&day_of_week_layer, GRect(97, 140, 36, 22), s_orbitron_font_20);
+
   // To launch time changing handler
   time_t now = time(NULL);
   handle_timechanges(localtime(&now), SECOND_UNIT);
@@ -226,14 +183,17 @@ void init(void){
   window_stack_push(window, true);
   
   // App Logging!
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "[handle_init] Hello World from the applogs!");
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "[handle_init] Hello World from the applogs!");
 }
 
 // Initialize text layer shorthand
-void init_time_layer(TextLayer *txt_layer){
-  text_layer_set_background_color(txt_layer, GColorClear);
-  text_layer_set_text_color(txt_layer, GColorWhite);
-  text_layer_set_text_alignment(txt_layer, GTextAlignmentRight);
+void init_time_layer(TextLayer **txt_layer, struct GRect grect, GFont font){
+  *txt_layer = text_layer_create(grect);
+  text_layer_set_font(*txt_layer, font);
+  text_layer_set_background_color(*txt_layer, GColorClear);
+  text_layer_set_text_color(*txt_layer, GColorWhite);
+  text_layer_set_text_alignment(*txt_layer, GTextAlignmentCenter);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(*txt_layer));
 }
 
 // Program deinitializer
