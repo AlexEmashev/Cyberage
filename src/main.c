@@ -1,5 +1,8 @@
 #include <pebble.h>
 #include "main.h"
+// Define "magic numbers" for temperature and weather conditions
+#define KEY_TEMPERATURE 0
+#define KEY_CONDITIONS 1
 // Pebble Screen is 144 x 168
 
 GFont s_orbitron_font_36;
@@ -8,7 +11,7 @@ static Window *window;
 // Time text layers
 static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minutes_2nd_layer, 
   *seconds_1st_layer, *seconds_2nd_layer, *day_1st_layer, *day_2nd_layer, *month_1st_layer, *month_2nd_layer,
-  *day_of_week_layer;
+  *day_of_week_layer, *s_weather_layer;
 // Time angles decorations
 static BitmapLayer *s_time_angles_layer;
 static GBitmap *s_time_angles_bmp;
@@ -130,7 +133,72 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   text_layer_set_text(month_1st_layer, month_1st_digit);
   text_layer_set_text(month_2nd_layer, month_2nd_digit);
   text_layer_set_text(day_of_week_layer, day_of_week);
+  
+  // Get weather update every 30 minutes
+  if(tick_time->tm_min % 30 == 0 && tick_time->tm_sec == 0){
+    // Begin dictionary
+    DictionaryIterator *iter;
+    app_message_outbox_begin(&iter);
+    
+    // Add a key-value pair
+    dict_write_uint8(iter, 0, 0);
+    
+    // Send the message
+    app_message_outbox_send();
+  }
 }
+
+
+///// AppMessage callbacks to talk to phone ///// 
+
+// Callback for receiving messages from AppMessage API
+static void inbox_received_callback(DictionaryIterator *iterator, void *context){
+  static char temperature_buffer[8];
+  static char conditions_buffer[32];
+  static char weather_layer_buffer[32];
+  
+  // Read first item
+  Tuple *t = dict_read_first(iterator);
+  
+  // For all items
+  while(t != NULL){
+    // Define which key was received
+    switch(t->key){
+      case KEY_TEMPERATURE:
+        snprintf(temperature_buffer, sizeof(temperature_buffer), "%dC", (int)t->value->int32);
+        break;
+      case KEY_CONDITIONS:
+        snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
+        break;
+      default:
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
+    }
+
+    t = dict_read_next(iterator);
+  }
+  
+  snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), 
+           "%s %s", temperature_buffer, conditions_buffer);
+  text_layer_set_text(s_weather_layer, weather_layer_buffer);
+}
+
+// Callback called when watch dropped message
+static void inbox_dropped_calback(AppMessageResult reason, void *context){
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!");
+}
+
+// Callback for failing to send a message from outox
+static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context){
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!");
+}
+
+// Callback called when message sent successfully
+static void outbox_sent_callback(DictionaryIterator *iterator, void *context){
+  APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+}
+
+
+///// Program initializers /////
 
 // Program initializer
 void init(void){
@@ -154,7 +222,7 @@ void init(void){
   bitmap_layer_set_bitmap(s_time_angles_layer, s_time_angles_bmp);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_time_angles_layer));
   
-  // Setup hours layers
+  // Initialize hours layers
   init_text_layer(&hours_1st_layer, GRect(4, 50, 32, 36), s_orbitron_font_36);
   init_text_layer(&hours_2nd_layer, GRect(35, 50, 32, 36), s_orbitron_font_36);
   
@@ -172,6 +240,15 @@ void init(void){
   
   init_text_layer(&day_of_week_layer, GRect(97, 140, 36, 22), s_orbitron_font_20);
 
+  // Initialize weather layer
+  s_weather_layer = text_layer_create(GRect(0, 2, 144, 25));
+  text_layer_set_background_color(s_weather_layer, GColorClear);
+  text_layer_set_text_color(s_weather_layer, GColorWhite);
+  text_layer_set_text_alignment(s_weather_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_weather_layer, "Loading...");
+  text_layer_set_font(s_weather_layer, s_orbitron_font_20);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
+  
   // To launch time changing handler
   time_t now = time(NULL);
   handle_timechanges(localtime(&now), SECOND_UNIT);
@@ -181,9 +258,15 @@ void init(void){
   
   // Push the window
   window_stack_push(window, true);
+
+  // Register callbacks for messages system AppMessage
+  app_message_register_inbox_received(inbox_received_callback);
+  app_message_register_inbox_dropped(inbox_dropped_calback);
+  app_message_register_outbox_failed(outbox_failed_callback);
+  app_message_register_outbox_sent(outbox_sent_callback);
   
-  // App Logging!
-  //APP_LOG(APP_LOG_LEVEL_DEBUG, "[handle_init] Hello World from the applogs!");
+  // Open AppMessage
+  app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
 }
 
 // Initialize text layer shorthand
@@ -210,12 +293,17 @@ void deinit(void){
   text_layer_destroy(month_1st_layer);
   text_layer_destroy(month_2nd_layer);
   text_layer_destroy(day_of_week_layer);
+  text_layer_destroy(s_weather_layer);
   
   // Destroy graphics
   gbitmap_destroy(s_time_angles_bmp);
   gbitmap_destroy(s_seconds_arows_bmp);
   bitmap_layer_destroy(s_time_angles_layer);
   bitmap_layer_destroy(s_seconds_arows_layer);
+  
+  // Unload fonts
+  fonts_unload_custom_font(s_orbitron_font_36);
+  fonts_unload_custom_font(s_orbitron_font_20);
   
   // Destroy the window
   window_destroy(window);
