@@ -238,7 +238,7 @@ void init(void){
   init_text_layer(&month_1st_layer, GRect(52, 140, 18, 20), s_orbitron_font_20);
   init_text_layer(&month_2nd_layer, GRect(70, 140, 18, 20), s_orbitron_font_20);
   
-  init_text_layer(&day_of_week_layer, GRect(97, 140, 36, 22), s_orbitron_font_20);
+  init_text_layer(&day_of_week_layer, GRect(95, 140, 40, 20), s_orbitron_font_20);
 
   // Initialize weather layer
   s_weather_layer = text_layer_create(GRect(0, 2, 144, 25));
