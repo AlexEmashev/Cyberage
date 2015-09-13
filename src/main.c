@@ -82,7 +82,7 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   switch (day_of_week_id[0]){
     case '0':
     {
-      strcpy(day_of_week, "SA");
+      strcpy(day_of_week, "SU");
       break;
     }
     case '1':
@@ -112,7 +112,7 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
     }
     case '6':
     {
-      strcpy(day_of_week, "ST");
+      strcpy(day_of_week, "SA");
       break;
     }
     default:
