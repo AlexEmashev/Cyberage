@@ -229,7 +229,7 @@ void init(void){
 
   // Initialize battery lightning
   s_battery_lightning_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_LIGHTNING);
-  s_battery_lightning_layer = bitmap_layer_create(GRect(43, 23, 17, 14));
+  s_battery_lightning_layer = bitmap_layer_create(GRect(37, 30, 17, 14));
   bitmap_layer_set_bitmap(s_battery_lightning_layer, s_battery_lightning_bmp);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_battery_lightning_layer));
   
@@ -261,7 +261,7 @@ void init(void){
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
 
   // Initialize battery layer
-  s_battery_info_layer = text_layer_create(GRect(0, 2, 144, 25));
+  s_battery_info_layer = text_layer_create(GRect(55, 30, 144, 25));
   text_layer_set_background_color(s_battery_info_layer, GColorClear);
   text_layer_set_text_color(s_battery_info_layer, GColorWhite);
   text_layer_set_text_alignment(s_battery_info_layer, GTextAlignmentLeft);
