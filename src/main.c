@@ -7,6 +7,7 @@
 
 GFont s_orbitron_font_36;
 GFont s_orbitron_font_20;
+GFont s_orbitron_font_15;
 static Window *window;
 // Time text layers
 static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minutes_2nd_layer, 
