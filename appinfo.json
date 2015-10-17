@@ -13,7 +13,7 @@
         "media": [
             {
                 "file": "images/battery-lightning.png",
-                "name": "BATTERY_LIGHTNING",
+                "name": "IMAGE_BATTERY_LIGHTNING",
                 "type": "png"
             },            
             {
