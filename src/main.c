@@ -11,7 +11,7 @@ static Window *window;
 // Time text layers
 static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minutes_2nd_layer, 
   *seconds_1st_layer, *seconds_2nd_layer, *day_1st_layer, *day_2nd_layer, *month_1st_layer, *month_2nd_layer,
-  *day_of_week_layer, *s_weather_layer;
+  *day_of_week_layer, *s_weather_layer, *s_battery_info_layer;
 // Battery ico
 static BitmapLayer *s_battery_lightning_layer;
 static GBitmap *s_battery_lightning_bmp;
@@ -212,6 +212,7 @@ void init(void){
   // Initialize font for time
   s_orbitron_font_36 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_36));
   s_orbitron_font_20 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_20));
+  s_orbitron_font_15 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_15));
   
   // Initialize time angles decorations
   s_time_angles_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_TIME_ANGLES);
@@ -254,9 +255,18 @@ void init(void){
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorWhite);
   text_layer_set_text_alignment(s_weather_layer, GTextAlignmentCenter);
-  text_layer_set_text(s_weather_layer, "Loading...");
   text_layer_set_font(s_weather_layer, s_orbitron_font_20);
+  text_layer_set_text(s_weather_layer, "Loading...");
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
+
+  // Initialize battery layer
+  s_battery_info_layer = text_layer_create(GRect(0, 2, 144, 25));
+  text_layer_set_background_color(s_battery_info_layer, GColorClear);
+  text_layer_set_text_color(s_battery_info_layer, GColorWhite);
+  text_layer_set_text_alignment(s_battery_info_layer, GTextAlignmentLeft);
+  text_layer_set_font(s_battery_info_layer, s_orbitron_font_15);
+  text_layer_set_text(s_battery_info_layer, "100%");
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_battery_info_layer));
   
   // To launch time changing handler
   time_t now = time(NULL);
@@ -315,6 +325,7 @@ void deinit(void){
   // Unload fonts
   fonts_unload_custom_font(s_orbitron_font_36);
   fonts_unload_custom_font(s_orbitron_font_20);
+  fonts_unload_custom_font(s_orbitron_font_15);
   
   // Destroy the window
   window_destroy(window);
