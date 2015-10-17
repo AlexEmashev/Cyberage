@@ -12,10 +12,10 @@
     "resources": {
         "media": [
             {
-                "file": "images/battery-lightning.png",
-                "name": "IMAGE_BATTERY_LIGHTNING",
+                "file": "images/time-angles.png",
+                "name": "IMAGE_TIME_ANGLES",
                 "type": "png"
-            },            
+            },
             {
                 "file": "images/second-arows2.png",
                 "name": "IMAGE_SECOND_AROWS2",
@@ -27,9 +27,15 @@
                 "type": "png"
             },
             {
-                "file": "images/time-angles.png",
-                "name": "IMAGE_TIME_ANGLES",
+                "file": "images/battery-lightning.png",
+                "name": "IMAGE_BATTERY_LIGHTNING",
                 "type": "png"
+            },
+            {
+                "characterRegex": "[0-9%]",
+                "file": "fonts/orbitron-light.ttf",
+                "name": "FONT_ORBITRON_LIGHT_15",
+                "type": "font"
             },
             {
                 "characterRegex": "[0-9]",
