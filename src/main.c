@@ -235,25 +235,25 @@ void init(void){
   
   // Initialize time angles decorations
   s_time_angles_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_TIME_ANGLES);
-  s_seconds_arows_layer = bitmap_layer_create(GRect(0, 54, 144, 38));
+  s_seconds_arows_layer = bitmap_layer_create(GRect(0, 56, 144, 38));
   bitmap_layer_set_bitmap(s_seconds_arows_layer, s_time_angles_bmp);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_seconds_arows_layer));
   
   // Initialize secnods arows decorations
   s_time_angles_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_SECOND_AROWS1);
-  s_time_angles_layer = bitmap_layer_create(GRect(43, 103, 55, 5));
+  s_time_angles_layer = bitmap_layer_create(GRect(43, 107, 55, 5));
   bitmap_layer_set_bitmap(s_time_angles_layer, s_time_angles_bmp);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_time_angles_layer));
   
   // Initialize hours layers
-  init_text_layer(&hours_1st_layer, GRect(4, 50, 32, 36), s_orbitron_font_36);
-  init_text_layer(&hours_2nd_layer, GRect(35, 50, 32, 36), s_orbitron_font_36);
+  init_text_layer(&hours_1st_layer, GRect(4, 54, 32, 36), s_orbitron_font_36);
+  init_text_layer(&hours_2nd_layer, GRect(35, 54, 32, 36), s_orbitron_font_36);
   
-  init_text_layer(&minutes_1st_layer, GRect(75, 50, 32, 36), s_orbitron_font_36);
-  init_text_layer(&minutes_2nd_layer, GRect(105, 50, 32, 36), s_orbitron_font_36);
+  init_text_layer(&minutes_1st_layer, GRect(75, 54, 32, 36), s_orbitron_font_36);
+  init_text_layer(&minutes_2nd_layer, GRect(105, 54, 32, 36), s_orbitron_font_36);
   
-  init_text_layer(&seconds_1st_layer, GRect(53, 93, 18, 20), s_orbitron_font_20);
-  init_text_layer(&seconds_2nd_layer, GRect(71, 93, 18, 20), s_orbitron_font_20);
+  init_text_layer(&seconds_1st_layer, GRect(53, 95, 18, 20), s_orbitron_font_20);
+  init_text_layer(&seconds_2nd_layer, GRect(71, 95, 18, 20), s_orbitron_font_20);
   
   init_text_layer(&day_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
   init_text_layer(&day_2nd_layer, GRect(24, 140, 28, 20), s_orbitron_font_20);
@@ -264,7 +264,7 @@ void init(void){
   init_text_layer(&day_of_week_layer, GRect(95, 140, 40, 20), s_orbitron_font_20);
 
   // Initialize weather layer
-  s_weather_layer = text_layer_create(GRect(0, 2, 144, 25));
+  s_weather_layer = text_layer_create(GRect(0, -2, 144, 25));
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorWhite);
   text_layer_set_text_alignment(s_weather_layer, GTextAlignmentCenter);
@@ -274,12 +274,12 @@ void init(void){
   
   // Initialize battery lightning
   s_battery_lightning_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_LIGHTNING);
-  s_battery_lightning_layer = bitmap_layer_create(GRect(40, 35, 17, 14));
+  s_battery_lightning_layer = bitmap_layer_create(GRect(40, 39, 17, 14));
   bitmap_layer_set_bitmap(s_battery_lightning_layer, s_battery_lightning_bmp);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_battery_lightning_layer));
 
   // Initialize battery layer
-  s_battery_info_layer = text_layer_create(GRect(60, 32, 47, 25));
+  s_battery_info_layer = text_layer_create(GRect(60, 36, 47, 25));
   text_layer_set_background_color(s_battery_info_layer, GColorClear);
   text_layer_set_text_color(s_battery_info_layer, GColorWhite);
   text_layer_set_text_alignment(s_battery_info_layer, GTextAlignmentLeft);
@@ -337,6 +337,7 @@ void deinit(void){
   text_layer_destroy(month_2nd_layer);
   text_layer_destroy(day_of_week_layer);
   text_layer_destroy(s_weather_layer);
+  text_layer_destroy(s_battery_info_layer);
   
   // Destroy graphics
   gbitmap_destroy(s_time_angles_bmp);
