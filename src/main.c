@@ -12,6 +12,9 @@ static Window *window;
 static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minutes_2nd_layer, 
   *seconds_1st_layer, *seconds_2nd_layer, *day_1st_layer, *day_2nd_layer, *month_1st_layer, *month_2nd_layer,
   *day_of_week_layer, *s_weather_layer;
+// Battery ico
+static BitmapLayer *s_battery_lightning_layer;
+static GBitmap *s_battery_lightning_bmp;
 // Time angles decorations
 static BitmapLayer *s_time_angles_layer;
 static GBitmap *s_time_angles_bmp;
@@ -221,6 +224,12 @@ void init(void){
   s_time_angles_layer = bitmap_layer_create(GRect(43, 103, 55, 5));
   bitmap_layer_set_bitmap(s_time_angles_layer, s_time_angles_bmp);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_time_angles_layer));
+
+  // Initialize battery lightning
+  s_battery_lightning_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_LIGHTNING);
+  s_battery_lightning_layer = bitmap_layer_create(GRect(43, 23, 17, 14));
+  bitmap_layer_set_bitmap(s_battery_lightning_layer, s_battery_lightning_bmp);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_battery_lightning_layer));
   
   // Initialize hours layers
   init_text_layer(&hours_1st_layer, GRect(4, 50, 32, 36), s_orbitron_font_36);
@@ -300,6 +309,8 @@ void deinit(void){
   gbitmap_destroy(s_seconds_arows_bmp);
   bitmap_layer_destroy(s_time_angles_layer);
   bitmap_layer_destroy(s_seconds_arows_layer);
+  gbitmap_destroy(s_battery_lightning_bmp);
+  bitmap_layer_destroy(s_battery_lightning_layer);
   
   // Unload fonts
   fonts_unload_custom_font(s_orbitron_font_36);

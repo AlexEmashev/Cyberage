@@ -12,6 +12,11 @@
     "resources": {
         "media": [
             {
+                "file": "images/battery-lightning.png",
+                "name": "BATTERY_LIGHTNING",
+                "type": "png"
+            },            
+            {
                 "file": "images/second-arows2.png",
                 "name": "IMAGE_SECOND_AROWS2",
                 "type": "png"
