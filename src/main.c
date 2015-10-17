@@ -3,6 +3,7 @@
 // Define "magic numbers" for temperature and weather conditions
 #define KEY_TEMPERATURE 0
 #define KEY_CONDITIONS 1
+#define KEY_ERROR 2
 // Pebble Screen is 144 x 168
 
 GFont s_orbitron_font_36;
@@ -181,6 +182,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       case KEY_CONDITIONS:
         snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
         break;
+      case KEY_ERROR:
+        snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
       default:
         APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
     }
@@ -200,6 +203,10 @@ static void inbox_dropped_calback(AppMessageResult reason, void *context){
 
 // Callback for failing to send a message from outox
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context){
+  // Print unsuccess message
+  static char message_buffer[32];
+  snprintf(message_buffer, sizeof(message_buffer), "%s", "--//--");
+  text_layer_set_text(s_weather_layer, message_buffer);
   APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!");
 }
 
