@@ -16,6 +16,8 @@ static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minute
 // Battery ico
 static BitmapLayer *s_battery_lightning_layer;
 static GBitmap *s_battery_lightning_bmp;
+static int s_battery_level;
+
 // Time angles decorations
 static BitmapLayer *s_time_angles_layer;
 static GBitmap *s_time_angles_bmp;
@@ -150,6 +152,11 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
     // Send the message
     app_message_outbox_send();
   }
+  
+  // Draw battery state
+  static char battery_buffer[5];
+  snprintf(battery_buffer, sizeof(battery_buffer), "%02d%%", s_battery_level);
+  text_layer_set_text(s_battery_info_layer, battery_buffer);
 }
 
 
@@ -202,6 +209,17 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context){
 }
 
 
+///// Battery info /////
+// Battery state callback
+static void battery_callback(BatteryChargeState state) {
+  // Get battery level
+  s_battery_level = state.charge_percent;
+  
+  if(state.is_charging) {
+    // Draw charging ico
+  }
+}
+
 ///// Program initializers /////
 
 // Program initializer
@@ -226,12 +244,6 @@ void init(void){
   s_time_angles_layer = bitmap_layer_create(GRect(43, 103, 55, 5));
   bitmap_layer_set_bitmap(s_time_angles_layer, s_time_angles_bmp);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_time_angles_layer));
-
-  // Initialize battery lightning
-  s_battery_lightning_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_LIGHTNING);
-  s_battery_lightning_layer = bitmap_layer_create(GRect(37, 30, 17, 14));
-  bitmap_layer_set_bitmap(s_battery_lightning_layer, s_battery_lightning_bmp);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_battery_lightning_layer));
   
   // Initialize hours layers
   init_text_layer(&hours_1st_layer, GRect(4, 50, 32, 36), s_orbitron_font_36);
@@ -259,14 +271,21 @@ void init(void){
   text_layer_set_font(s_weather_layer, s_orbitron_font_20);
   text_layer_set_text(s_weather_layer, "Loading...");
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
+  
+  // Initialize battery lightning
+  s_battery_lightning_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_LIGHTNING);
+  s_battery_lightning_layer = bitmap_layer_create(GRect(40, 35, 17, 14));
+  bitmap_layer_set_bitmap(s_battery_lightning_layer, s_battery_lightning_bmp);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_battery_lightning_layer));
 
   // Initialize battery layer
-  s_battery_info_layer = text_layer_create(GRect(55, 30, 144, 25));
+  s_battery_info_layer = text_layer_create(GRect(60, 32, 47, 25));
   text_layer_set_background_color(s_battery_info_layer, GColorClear);
   text_layer_set_text_color(s_battery_info_layer, GColorWhite);
   text_layer_set_text_alignment(s_battery_info_layer, GTextAlignmentLeft);
   text_layer_set_font(s_battery_info_layer, s_orbitron_font_15);
-  text_layer_set_text(s_battery_info_layer, "100%");
+  text_layer_set_text(s_battery_info_layer, "--%");
+  
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_battery_info_layer));
   
   // To launch time changing handler
@@ -284,6 +303,10 @@ void init(void){
   app_message_register_inbox_dropped(inbox_dropped_calback);
   app_message_register_outbox_failed(outbox_failed_callback);
   app_message_register_outbox_sent(outbox_sent_callback);
+  
+  // Register battery state callback
+  battery_state_service_subscribe(battery_callback);
+  battery_callback(battery_state_service_peek()); // get initial value
   
   // Open AppMessage
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
