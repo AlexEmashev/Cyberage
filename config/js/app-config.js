@@ -18,14 +18,22 @@ function submitHandler() {
 
 // Get data from config page
 function getAndStoreConfigData() {
-  var $timeFormat = $('#timeFormat');
+  var $militaryTime = $('#militaryTime');
+  var $temperatureCelsius = $('#temperatureCelsius');
+  var $dateDDMM = $('#dateDDMM');
   
   var options = {
-    militaryTime: $timeFormat[0].checked
+    militaryTime: $militaryTime[0].checked,
+    temperatureCelsius: $temperatureCelsius[0].checked,
+    dateDDMM: $dateDDMM[0].checked,
+    
   };
   
   // Store values to local storage, to load saved config
   localStorage.militaryTime = options.militaryTime;
+  localStorage.temperatureCelsius = options.temperatureCelsius;
+  localStorage.dateDDMM = options.dateDDMM;
+  
   console.log('Options are:' + JSON.stringify(options));
   return options;
 }
@@ -45,9 +53,23 @@ function getQueryParam(variable, defaultValue) {
 
 // Load stored options to the config page
 function loadOptions() {
-  var $timeFormat = $('#timeFormat');
+  var $militaryTime = $('#militaryTime');
+  var $normalTime = $('#normalTime');
+  var $temperatureCelsius = $('#temperatureCelsius');
+  var $temperatureFahrenheit = $('#temperatureFahrenheit');
+  var $dateDDMM = $('#dateDDMM');
+  var $dateMMDD = $('#dateMMDD');
   
-  if(localStorage.militaryTime) {
-    $timeFormat[0].checked = localStorage.militaryTime === 'true';
+  if(localStorage.getItem("militaryTime") != null){
+    $normalTime[0].checked = localStorage.getItem("militaryTime") === 'false'; // since str value is return
   }
+    
+  if(localStorage.getItem("dateDDMM") != null){
+    $dateMMDD[0].checked = localStorage.getItem("dateDDMM") === 'false';
+  }
+    
+  if(localStorage.getItem("temperatureCelsius") != null){
+    $temperatureFahrenheit[0].checked = localStorage.getItem("temperatureCelsius") === 'false';
+  }
+  
 }

@@ -17,11 +17,11 @@
     <div class="item-container-content">
       <label class="item">
         24h Format
-        <input id="dateddmm" type="radio" name="time" class="item-radio" checked>
+        <input id="militaryTime" type="radio" name="time" class="item-radio" checked>
       </label>
       <label class="item">
         12h Format
-        <input type="radio" name="time" class="item-radio">
+        <input id="normalTime" type="radio" name="time" class="item-radio">
       </label>
     </div>
   </div>
@@ -31,11 +31,11 @@
     <div class="item-container-content">
       <label class="item">
         Day / Month
-        <input id="dateddmm" type="radio" name="date" class="item-radio" value="ddmm" checked>
+        <input id="dateDDMM" type="radio" name="date" class="item-radio" checked>
       </label>
       <label class="item">
         Month / Day
-        <input type="radio" name="date" class="item-radio" value="mmdd">
+        <input id="dateMMDD" type="radio" name="date" class="item-radio">
       </label>
     </div>
   </div>
@@ -45,27 +45,26 @@
     <div class="item-container-content">
       <label class="item">
         Celsius
-        <input id="dateddmm" type="radio" name="weather" class="item-radio" value="ddmm" checked>
+        <input id="temperatureCelsius" type="radio" name="weather" class="item-radio" checked>
       </label>
       <label class="item">
         Fahrenheit
-        <input type="radio" name="weather" class="item-radio" value="mmdd">
+        <input id="temperatureFahrenheit" type="radio" name="weather" class="item-radio">
       </label>
     </div>
-    <div class="item-container-footer">
-      Hit save to apply settings.
-    </div>
   </div>
-
 
   <div class="item-container">
     <div class="button-container">
       <input type="button" id="submitButton" class="item-button" value="Save">
     </div>
+    <div class="item-container-footer">
+      Pebble watchface configuration window
+    </div>
   </div>
-
+   
   <script src="js/slate.min.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/app-config.js"></script>
 </body>
 
 </html>
