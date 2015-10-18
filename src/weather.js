@@ -18,7 +18,7 @@ var xhrRequest = function(url, type, callback){
 
 // On success location, make http request for weather
 function locationSuccess(pos){
-	var weatherApiKey = ''; // Please get your key on openweathermap.org it's free
+	var weatherApiKey = ''; // Please, get your key on openweathermap.org it's free
   // Request for weather
   var url = 'http://api.openweathermap.org/data/2.5/weather?lat=' +
       pos.coords.latitude + '&lon=' + pos.coords.longitude + 
