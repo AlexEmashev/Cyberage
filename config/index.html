@@ -10,37 +10,54 @@
 <div class="item-container">
   <h1 class="title">Configuration</h1>
 </div>
+
 <body>
-  <div class="item-container">Out of content</div>
   <div class="item-container">
+    <div class="item-container-header">Time format</div>
     <div class="item-container-content">
-      <div class="item">
-        Hello world, bitch
-      </div>
-      <div class="item">
-        Another item
-      </div>
+      <label class="item">
+        24h Format
+        <input id="dateddmm" type="radio" name="time" class="item-radio" checked>
+      </label>
+      <label class="item">
+        12h Format
+        <input type="radio" name="time" class="item-radio">
+      </label>
     </div>
   </div>
 
   <div class="item-container">
-   <div class="item-container-header">Cyberage config</div>
+    <div class="item-container-header">Date format</div>
     <div class="item-container-content">
-      <div class="item">
-        <label class="item">
-          24-Hour format
-        <input id="timeFormatCheckbox" type="checkbox" class="item-checkbox" checked>
-        </label>
-      </div>
-      <div class="item">
-        Another item
-      </div>
+      <label class="item">
+        Day / Month
+        <input id="dateddmm" type="radio" name="date" class="item-radio" value="ddmm" checked>
+      </label>
+      <label class="item">
+        Month / Day
+        <input type="radio" name="date" class="item-radio" value="mmdd">
+      </label>
+    </div>
+  </div>
+
+  <div class="item-container">
+    <div class="item-container-header">Weather format</div>
+    <div class="item-container-content">
+      <label class="item">
+        Celsius
+        <input id="dateddmm" type="radio" name="weather" class="item-radio" value="ddmm" checked>
+      </label>
+      <label class="item">
+        Fahrenheit
+        <input type="radio" name="weather" class="item-radio" value="mmdd">
+      </label>
     </div>
     <div class="item-container-footer">
       Hit save to apply settings.
     </div>
   </div>
-  
+
+
   <div class="item-container">
     <div class="button-container">
       <input type="button" id="submitButton" class="item-button" value="Save">
