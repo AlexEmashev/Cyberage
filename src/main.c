@@ -1,9 +1,13 @@
 #include <pebble.h>
 #include "main.h"
-// Define "magic numbers" for temperature and weather conditions
+
 #define KEY_TEMPERATURE 0
 #define KEY_CONDITIONS 1
 #define KEY_ERROR 2
+#define KEY_MILITARY_TIME 3
+#define KEY_TEMPC 4
+#define KEY_DATEDDMM 5
+
 // Pebble Screen is 144 x 168
 
 GFont s_orbitron_font_36;
@@ -26,14 +30,21 @@ static GBitmap *s_time_angles_bmp;
 static BitmapLayer *s_seconds_arows_layer;
 static GBitmap *s_seconds_arows_bmp;
 
+// Time format
+static bool militaryTime = true;
+
 // Redraw time when it's changed (every second)
 void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   // TimeUnits to redraw just part of screen
   // Buffer where we write time
   static char time_buffer[17];
   
-  // Get time in format "hh:mm:ss dd.mm w"
-  strftime(time_buffer, sizeof(time_buffer), "%H:%M:%S %d.%m %w", tick_time);
+  if (militaryTime) {
+    strftime(time_buffer, sizeof(time_buffer), "%H:%M:%S %d.%m %w", tick_time);
+  } else {
+    strftime(time_buffer, sizeof(time_buffer), "%I:%M:%S %d.%m %w", tick_time);
+  }
+  
   // Separate digits
   static char hours_1st_digit[2];
   hours_1st_digit[0] = time_buffer[0];
@@ -184,6 +195,12 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         break;
       case KEY_ERROR:
         snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
+        break;
+      case KEY_MILITARY_TIME:
+        if (t->value->int8 == 102 || t->value->int8 == 0){
+          militaryTime = false;
+          persist_write_bool(KEY_MILITARY_TIME, militaryTime);
+        }
       default:
         APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
     }

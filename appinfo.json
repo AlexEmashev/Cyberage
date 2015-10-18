@@ -1,7 +1,10 @@
 {
     "appKeys": {
         "KEY_CONDITIONS": 1,
+        "KEY_DATEDDMM": 5,
         "KEY_ERROR": 2,
+        "KEY_MILITARY_TIME": 3,
+        "KEY_TEMPC": 4,
         "KEY_TEMPERATURE": 0
     },
     "capabilities": [
@@ -34,9 +37,13 @@
                 "type": "png"
             },
             {
-                "characterRegex": "[0-9%]",
                 "file": "fonts/orbitron-light.ttf",
-                "name": "FONT_ORBITRON_LIGHT_15",
+                "name": "FONT_ORBITRON_LIGHT_20",
+                "type": "font"
+            },
+            {
+                "file": "fonts/orbitron-light.ttf",
+                "name": "FONT_ORBITRON_LIGHT_24",
                 "type": "font"
             },
             {
@@ -46,13 +53,9 @@
                 "type": "font"
             },
             {
+                "characterRegex": "[0-9%]",
                 "file": "fonts/orbitron-light.ttf",
-                "name": "FONT_ORBITRON_LIGHT_24",
-                "type": "font"
-            },
-            {
-                "file": "fonts/orbitron-light.ttf",
-                "name": "FONT_ORBITRON_LIGHT_20",
+                "name": "FONT_ORBITRON_LIGHT_15",
                 "type": "font"
             }
         ]
