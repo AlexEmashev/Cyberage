@@ -34,13 +34,9 @@
                 "type": "png"
             },
             {
+                "characterRegex": "[0-9%]",
                 "file": "fonts/orbitron-light.ttf",
-                "name": "FONT_ORBITRON_LIGHT_20",
-                "type": "font"
-            },
-            {
-                "file": "fonts/orbitron-light.ttf",
-                "name": "FONT_ORBITRON_LIGHT_24",
+                "name": "FONT_ORBITRON_LIGHT_15",
                 "type": "font"
             },
             {
@@ -50,9 +46,13 @@
                 "type": "font"
             },
             {
-                "characterRegex": "[0-9%]",
                 "file": "fonts/orbitron-light.ttf",
-                "name": "FONT_ORBITRON_LIGHT_15",
+                "name": "FONT_ORBITRON_LIGHT_24",
+                "type": "font"
+            },
+            {
+                "file": "fonts/orbitron-light.ttf",
+                "name": "FONT_ORBITRON_LIGHT_20",
                 "type": "font"
             }
         ]
