@@ -3,7 +3,7 @@ Pebble.addEventListener('ready', function() {
 });
 
 Pebble.addEventListener('showConfiguration', function() {
-  var url = 'http://247583c6.ngrok.io'; // Past configuration page URL here
+  var url = 'http://alexemashev.github.io/Cyberage'; // Past configuration URL here
   
   console.log('Showing config page: %s', url);
   
