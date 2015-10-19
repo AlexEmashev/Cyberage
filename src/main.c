@@ -32,6 +32,12 @@ static GBitmap *s_seconds_arows_bmp;
 
 // Time format
 static bool militaryTime = true;
+// Temperature format
+static bool tempC = true;
+
+// Weather countdown
+static const int weatherCountdownInit = 1800; // Initial value
+static int weatherCountdown; // Time to re-read weather values
 
 // Redraw time when it's changed (every second)
 void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
@@ -152,9 +158,23 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   text_layer_set_text(month_2nd_layer, month_2nd_digit);
   text_layer_set_text(day_of_week_layer, day_of_week);
   
-  // Get weather update every 30 minutes
-  if(tick_time->tm_min % 30 == 0 && tick_time->tm_sec == 0){
-    // Begin dictionary
+  // Get weather update
+  if (weatherCountdown > 0) {
+    weatherCountdown -= 1;
+  } else {
+    get_weather();
+    weatherCountdown = weatherCountdownInit;
+  }
+  
+  // Draw battery state
+  static char battery_buffer[5];
+  snprintf(battery_buffer, sizeof(battery_buffer), "%02d%%", s_battery_level);
+  text_layer_set_text(s_battery_info_layer, battery_buffer);
+}
+
+// Send weather request
+static void get_weather() {
+  // Begin dictionary
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
     
@@ -163,12 +183,6 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
     
     // Send the message
     app_message_outbox_send();
-  }
-  
-  // Draw battery state
-  static char battery_buffer[5];
-  snprintf(battery_buffer, sizeof(battery_buffer), "%02d%%", s_battery_level);
-  text_layer_set_text(s_battery_info_layer, battery_buffer);
 }
 
 
@@ -188,7 +202,13 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Define which key was received
     switch(t->key){
       case KEY_TEMPERATURE:
-        snprintf(temperature_buffer, sizeof(temperature_buffer), "%dC", (int)t->value->int32);
+        if (tempC){
+          snprintf(temperature_buffer, sizeof(temperature_buffer), "%dC", (int)t->value->int32);
+        } else {
+          int tempF = (int)t->value->int32 * 1.8 + 32;
+          snprintf(temperature_buffer, sizeof(temperature_buffer), "%dF", tempF);
+        }
+        
         break;
       case KEY_CONDITIONS:
         snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
@@ -203,8 +223,19 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         } else {
           militaryTime = true;
         }
-        APP_LOG(APP_LOG_LEVEL_ERROR, "MilitaryTime is %d", militaryTime);
+      
         persist_write_bool(KEY_MILITARY_TIME, militaryTime);
+        break;
+      case KEY_TEMPC:
+        if (t->value->int8 == 102 || t->value->int8 == 0){
+          tempC = false;
+          
+        } else {
+          tempC = true;
+        }
+
+        get_weather(); // Reread weather
+        persist_write_bool(KEY_TEMPC, tempC);
         break;
       default:
         APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
@@ -262,6 +293,10 @@ void init(void){
     militaryTime = persist_read_bool(KEY_MILITARY_TIME);
   }
   
+  if (persist_exists(KEY_TEMPC)) {
+    tempC = persist_read_bool(KEY_TEMPC);
+  }
+  
   // Initialize font for time
   s_orbitron_font_36 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_36));
   s_orbitron_font_20 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_20));
@@ -305,6 +340,7 @@ void init(void){
   text_layer_set_font(s_weather_layer, s_orbitron_font_20);
   text_layer_set_text(s_weather_layer, "Loading...");
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
+   weatherCountdown = weatherCountdownInit; // Time to re-read weather values
   
   // Initialize battery lightning
   s_battery_lightning_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_LIGHTNING);
