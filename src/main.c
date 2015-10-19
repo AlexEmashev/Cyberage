@@ -16,7 +16,7 @@ GFont s_orbitron_font_15;
 static Window *window;
 // Time text layers
 static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minutes_2nd_layer, 
-  *seconds_1st_layer, *seconds_2nd_layer, *day_1st_layer, *day_2nd_layer, *month_1st_layer, *month_2nd_layer,
+  *seconds_1st_layer, *seconds_2nd_layer, *day_1st_layer, *day_2nd_layer, *date_delimiter_layer, *month_1st_layer, *month_2nd_layer,
   *day_of_week_layer, *s_weather_layer, *s_battery_info_layer;
 // Battery ico
 static BitmapLayer *s_battery_lightning_layer;
@@ -34,6 +34,8 @@ static GBitmap *s_seconds_arows_bmp;
 static bool militaryTime = true;
 // Temperature format
 static bool tempC = true;
+// Date format
+static bool dateDDMM = true;
 
 // Weather countdown
 static const int weatherCountdownInit = 1800; // Initial value
@@ -80,18 +82,21 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   
   static char day_1st_digit[2];
   day_1st_digit[0] = time_buffer[9];
-  //day_1st_digit[0] = '8';
+  //day_1st_digit[0] = '0';
   day_1st_digit[1] = '\0';
   
-  static char day_2nd_digit[3];
+  static char day_2nd_digit[2];
   day_2nd_digit[0] = time_buffer[10];
-  //day_2nd_digit[0] = '8';
-  day_2nd_digit[1] = '/';
-  day_2nd_digit[2] = '\0';
+  //day_2nd_digit[0] = '0';
+  day_2nd_digit[1] = '\0';
+  
+  static char date_delimiter[2];
+  date_delimiter[0] = '/';
+  date_delimiter[1] = '\0';
   
   static char month_1st_digit[2];
   month_1st_digit[0] = time_buffer[12];
-  //month_1st_digit[0] = '8';
+  //month_1st_digit[0] = '0';
   month_1st_digit[1] = '\0';
   
   static char month_2nd_digit[2];
@@ -154,6 +159,7 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   // Drawing date.
   text_layer_set_text(day_1st_layer, day_1st_digit);
   text_layer_set_text(day_2nd_layer, day_2nd_digit);
+  text_layer_set_text(date_delimiter_layer, date_delimiter);
   text_layer_set_text(month_1st_layer, month_1st_digit);
   text_layer_set_text(month_2nd_layer, month_2nd_digit);
   text_layer_set_text(day_of_week_layer, day_of_week);
@@ -237,6 +243,17 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         get_weather(); // Reread weather
         persist_write_bool(KEY_TEMPC, tempC);
         break;
+      case KEY_DATEDDMM:
+        if (t->value->int8 == 102 || t->value->int8 == 0){
+          dateDDMM = false;
+          
+        } else {
+          dateDDMM = true;
+        }
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Date format %d", (int)t->key);
+      
+        persist_write_bool(KEY_DATEDDMM, dateDDMM);
+        break;
       default:
         APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
     }
@@ -297,6 +314,10 @@ void init(void){
     tempC = persist_read_bool(KEY_TEMPC);
   }
   
+  if (persist_exists(KEY_DATEDDMM)) {
+    dateDDMM = persist_read_bool(KEY_DATEDDMM);
+  }
+  
   // Initialize font for time
   s_orbitron_font_36 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_36));
   s_orbitron_font_20 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_20));
@@ -325,12 +346,14 @@ void init(void){
   init_text_layer(&seconds_2nd_layer, GRect(71, 95, 18, 20), s_orbitron_font_20);
   
   init_text_layer(&day_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
-  init_text_layer(&day_2nd_layer, GRect(24, 140, 28, 20), s_orbitron_font_20);
+  init_text_layer(&day_2nd_layer, GRect(19, 140, 28, 20), s_orbitron_font_20);
   
-  init_text_layer(&month_1st_layer, GRect(52, 140, 18, 20), s_orbitron_font_20);
-  init_text_layer(&month_2nd_layer, GRect(70, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&date_delimiter_layer, GRect(35, 140, 28, 20), s_orbitron_font_20);
+      
+  init_text_layer(&month_1st_layer, GRect(57, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&month_2nd_layer, GRect(75, 140, 18, 20), s_orbitron_font_20);
   
-  init_text_layer(&day_of_week_layer, GRect(95, 140, 40, 20), s_orbitron_font_20);
+  init_text_layer(&day_of_week_layer, GRect(98, 140, 40, 20), s_orbitron_font_20);
 
   // Initialize weather layer
   s_weather_layer = text_layer_create(GRect(0, -2, 144, 25));
@@ -408,6 +431,7 @@ void deinit(void){
   text_layer_destroy(day_of_week_layer);
   text_layer_destroy(s_weather_layer);
   text_layer_destroy(s_battery_info_layer);
+  text_layer_destroy(date_delimiter_layer);
   
   // Destroy graphics
   gbitmap_destroy(s_time_angles_bmp);
