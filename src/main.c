@@ -199,8 +199,13 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       case KEY_MILITARY_TIME:
         if (t->value->int8 == 102 || t->value->int8 == 0){
           militaryTime = false;
-          persist_write_bool(KEY_MILITARY_TIME, militaryTime);
+          
+        } else {
+          militaryTime = true;
         }
+        APP_LOG(APP_LOG_LEVEL_ERROR, "MilitaryTime is %d", militaryTime);
+        persist_write_bool(KEY_MILITARY_TIME, militaryTime);
+        break;
       default:
         APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
     }
@@ -251,6 +256,11 @@ void init(void){
   // Create a window and text layer
   window = window_create();
   window_set_background_color(window, GColorBlack);
+  
+  // Read settings
+  if (persist_exists(KEY_MILITARY_TIME)) {
+    militaryTime = persist_read_bool(KEY_MILITARY_TIME);
+  }
   
   // Initialize font for time
   s_orbitron_font_36 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_36));

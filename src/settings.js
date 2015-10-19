@@ -17,13 +17,13 @@ Pebble.addEventListener('webviewclosed', function(e) {
   
   if(Object.keys(configData).length > 0) {
     Pebble.sendAppMessage({
-      militaryTime: configData.militaryTime,
-      tempC: configData.temperatureCelsius,
-      dateDDMM: configData.dateDDMM
+      'KEY_MILITARY_TIME': configData.militaryTime,
+      'KEY_TEMPC': configData.temperatureCelsius,
+      'KEY_DATEDDMM': configData.dateDDMM
     }, function() {
-      console.log('Send successful!');
+      console.log('Settings send successful to watch!');
     }, function() {
-      console.log('Send failed!');
+      console.log('Settings send failed to watch!');
     });
   }
 });
