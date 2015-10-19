@@ -16,7 +16,7 @@ GFont s_orbitron_font_15;
 static Window *window;
 // Time text layers
 static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minutes_2nd_layer, 
-  *seconds_1st_layer, *seconds_2nd_layer, *day_1st_layer, *day_2nd_layer, *date_delimiter_layer, *month_1st_layer, *month_2nd_layer,
+  *seconds_1st_layer, *seconds_2nd_layer, *date_1st_layer, *date_2nd_layer, *date_delimiter_layer, *date_3rd_layer, *date_4th_layer,
   *day_of_week_layer, *s_weather_layer, *s_battery_info_layer;
 // Battery ico
 static BitmapLayer *s_battery_lightning_layer;
@@ -156,12 +156,20 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   text_layer_set_text(seconds_1st_layer, seconds_1st_digit);
   text_layer_set_text(seconds_2nd_layer, seconds_2nd_digit);
   
-  // Drawing date.
-  text_layer_set_text(day_1st_layer, day_1st_digit);
-  text_layer_set_text(day_2nd_layer, day_2nd_digit);
+  // Drawing date according format.
+  if (dateDDMM){
+    text_layer_set_text(date_1st_layer, day_1st_digit);
+    text_layer_set_text(date_2nd_layer, day_2nd_digit);
+    text_layer_set_text(date_3rd_layer, month_1st_digit);
+    text_layer_set_text(date_4th_layer, month_2nd_digit);
+  } else {
+    text_layer_set_text(date_1st_layer, month_1st_digit);
+    text_layer_set_text(date_2nd_layer, month_2nd_digit);
+    text_layer_set_text(date_3rd_layer, day_1st_digit);
+    text_layer_set_text(date_4th_layer, day_2nd_digit);
+  }
+
   text_layer_set_text(date_delimiter_layer, date_delimiter);
-  text_layer_set_text(month_1st_layer, month_1st_digit);
-  text_layer_set_text(month_2nd_layer, month_2nd_digit);
   text_layer_set_text(day_of_week_layer, day_of_week);
   
   // Get weather update
@@ -345,13 +353,13 @@ void init(void){
   init_text_layer(&seconds_1st_layer, GRect(53, 95, 18, 20), s_orbitron_font_20);
   init_text_layer(&seconds_2nd_layer, GRect(71, 95, 18, 20), s_orbitron_font_20);
   
-  init_text_layer(&day_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
-  init_text_layer(&day_2nd_layer, GRect(19, 140, 28, 20), s_orbitron_font_20);
+  init_text_layer(&date_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&date_2nd_layer, GRect(19, 140, 28, 20), s_orbitron_font_20);
   
   init_text_layer(&date_delimiter_layer, GRect(35, 140, 28, 20), s_orbitron_font_20);
       
-  init_text_layer(&month_1st_layer, GRect(57, 140, 18, 20), s_orbitron_font_20);
-  init_text_layer(&month_2nd_layer, GRect(75, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&date_3rd_layer, GRect(57, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&date_4th_layer, GRect(75, 140, 18, 20), s_orbitron_font_20);
   
   init_text_layer(&day_of_week_layer, GRect(98, 140, 40, 20), s_orbitron_font_20);
 
@@ -424,10 +432,10 @@ void deinit(void){
   text_layer_destroy(minutes_2nd_layer);
   text_layer_destroy(seconds_1st_layer);
   text_layer_destroy(seconds_2nd_layer);
-  text_layer_destroy(day_1st_layer);
-  text_layer_destroy(day_2nd_layer);
-  text_layer_destroy(month_1st_layer);
-  text_layer_destroy(month_2nd_layer);
+  text_layer_destroy(date_1st_layer);
+  text_layer_destroy(date_2nd_layer);
+  text_layer_destroy(date_3rd_layer);
+  text_layer_destroy(date_4th_layer);
   text_layer_destroy(day_of_week_layer);
   text_layer_destroy(s_weather_layer);
   text_layer_destroy(s_battery_info_layer);
