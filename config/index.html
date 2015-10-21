@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Setting</title>
+  <link rel="stylesheet" href="css/slate.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<div class="item-container">
+  <h1 class="title">Configuration</h1>
+</div>
+
+<body>
+  <div class="item-container">
+    <div class="item-container-header">Time format</div>
+    <div class="item-container-content">
+      <label class="item">
+        24h Format
+        <input id="militaryTime" type="radio" name="time" class="item-radio" checked>
+      </label>
+      <label class="item">
+        12h Format
+        <input id="normalTime" type="radio" name="time" class="item-radio">
+      </label>
+    </div>
+  </div>
+
+  <div class="item-container">
+    <div class="item-container-header">Date format</div>
+    <div class="item-container-content">
+      <label class="item">
+        Day / Month
+        <input id="dateDDMM" type="radio" name="date" class="item-radio" checked>
+      </label>
+      <label class="item">
+        Month / Day
+        <input id="dateMMDD" type="radio" name="date" class="item-radio">
+      </label>
+    </div>
+  </div>
+
+  <div class="item-container">
+    <div class="item-container-header">Weather format</div>
+    <div class="item-container-content">
+      <label class="item">
+        Celsius
+        <input id="temperatureCelsius" type="radio" name="weather" class="item-radio" checked>
+      </label>
+      <label class="item">
+        Fahrenheit
+        <input id="temperatureFahrenheit" type="radio" name="weather" class="item-radio">
+      </label>
+    </div>
+  </div>
+
+  <div class="item-container">
+    <div class="button-container">
+      <input type="button" id="submitButton" class="item-button" value="Save">
+    </div>
+    <div class="item-container-footer">
+      Pebble watchface configuration window
+    </div>
+  </div>
+   
+  <script src="js/slate.min.js"></script>
+  <script src="js/app-config.js"></script>
+</body>
+
+</html>
