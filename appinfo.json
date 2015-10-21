@@ -57,6 +57,12 @@
                 "file": "fonts/orbitron-light.ttf",
                 "name": "FONT_ORBITRON_LIGHT_15",
                 "type": "font"
+            },
+            {
+                "menuIcon": true,
+                "type": "png",
+                "name": "IMAGE_MENU_ICON",
+                "file": "images/menu_icon.png"
             }
         ]
     },
