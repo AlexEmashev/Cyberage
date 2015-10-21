@@ -1,7 +1,10 @@
 {
     "appKeys": {
         "KEY_CONDITIONS": 1,
+        "KEY_DATEDDMM": 5,
         "KEY_ERROR": 2,
+        "KEY_MILITARY_TIME": 3,
+        "KEY_TEMPC": 4,
         "KEY_TEMPERATURE": 0
     },
     "capabilities": [

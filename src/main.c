@@ -1,9 +1,13 @@
 #include <pebble.h>
 #include "main.h"
-// Define "magic numbers" for temperature and weather conditions
+
 #define KEY_TEMPERATURE 0
 #define KEY_CONDITIONS 1
 #define KEY_ERROR 2
+#define KEY_MILITARY_TIME 3
+#define KEY_TEMPC 4
+#define KEY_DATEDDMM 5
+
 // Pebble Screen is 144 x 168
 
 GFont s_orbitron_font_36;
@@ -12,7 +16,7 @@ GFont s_orbitron_font_15;
 static Window *window;
 // Time text layers
 static TextLayer *hours_1st_layer, *hours_2nd_layer, *minutes_1st_layer, *minutes_2nd_layer, 
-  *seconds_1st_layer, *seconds_2nd_layer, *day_1st_layer, *day_2nd_layer, *month_1st_layer, *month_2nd_layer,
+  *seconds_1st_layer, *seconds_2nd_layer, *date_1st_layer, *date_2nd_layer, *date_delimiter_layer, *date_3rd_layer, *date_4th_layer,
   *day_of_week_layer, *s_weather_layer, *s_battery_info_layer;
 // Battery ico
 static BitmapLayer *s_battery_lightning_layer;
@@ -26,14 +30,29 @@ static GBitmap *s_time_angles_bmp;
 static BitmapLayer *s_seconds_arows_layer;
 static GBitmap *s_seconds_arows_bmp;
 
+// Time format
+static bool militaryTime = true;
+// Temperature format
+static bool tempC = true;
+// Date format
+static bool dateDDMM = true;
+
+// Weather countdown
+static const int weatherCountdownInit = 1800; // Initial value
+static int weatherCountdown; // Time to re-read weather values
+
 // Redraw time when it's changed (every second)
 void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   // TimeUnits to redraw just part of screen
   // Buffer where we write time
   static char time_buffer[17];
   
-  // Get time in format "hh:mm:ss dd.mm w"
-  strftime(time_buffer, sizeof(time_buffer), "%H:%M:%S %d.%m %w", tick_time);
+  if (militaryTime) {
+    strftime(time_buffer, sizeof(time_buffer), "%H:%M:%S %d.%m %w", tick_time);
+  } else {
+    strftime(time_buffer, sizeof(time_buffer), "%I:%M:%S %d.%m %w", tick_time);
+  }
+  
   // Separate digits
   static char hours_1st_digit[2];
   hours_1st_digit[0] = time_buffer[0];
@@ -63,18 +82,21 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   
   static char day_1st_digit[2];
   day_1st_digit[0] = time_buffer[9];
-  //day_1st_digit[0] = '8';
+  //day_1st_digit[0] = '0';
   day_1st_digit[1] = '\0';
   
-  static char day_2nd_digit[3];
+  static char day_2nd_digit[2];
   day_2nd_digit[0] = time_buffer[10];
-  //day_2nd_digit[0] = '8';
-  day_2nd_digit[1] = '/';
-  day_2nd_digit[2] = '\0';
+  //day_2nd_digit[0] = '0';
+  day_2nd_digit[1] = '\0';
+  
+  static char date_delimiter[2];
+  date_delimiter[0] = '/';
+  date_delimiter[1] = '\0';
   
   static char month_1st_digit[2];
   month_1st_digit[0] = time_buffer[12];
-  //month_1st_digit[0] = '8';
+  //month_1st_digit[0] = '0';
   month_1st_digit[1] = '\0';
   
   static char month_2nd_digit[2];
@@ -134,16 +156,39 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
   text_layer_set_text(seconds_1st_layer, seconds_1st_digit);
   text_layer_set_text(seconds_2nd_layer, seconds_2nd_digit);
   
-  // Drawing date.
-  text_layer_set_text(day_1st_layer, day_1st_digit);
-  text_layer_set_text(day_2nd_layer, day_2nd_digit);
-  text_layer_set_text(month_1st_layer, month_1st_digit);
-  text_layer_set_text(month_2nd_layer, month_2nd_digit);
+  // Drawing date according format.
+  if (dateDDMM){
+    text_layer_set_text(date_1st_layer, day_1st_digit);
+    text_layer_set_text(date_2nd_layer, day_2nd_digit);
+    text_layer_set_text(date_3rd_layer, month_1st_digit);
+    text_layer_set_text(date_4th_layer, month_2nd_digit);
+  } else {
+    text_layer_set_text(date_1st_layer, month_1st_digit);
+    text_layer_set_text(date_2nd_layer, month_2nd_digit);
+    text_layer_set_text(date_3rd_layer, day_1st_digit);
+    text_layer_set_text(date_4th_layer, day_2nd_digit);
+  }
+
+  text_layer_set_text(date_delimiter_layer, date_delimiter);
   text_layer_set_text(day_of_week_layer, day_of_week);
   
-  // Get weather update every 30 minutes
-  if(tick_time->tm_min % 30 == 0 && tick_time->tm_sec == 0){
-    // Begin dictionary
+  // Get weather update
+  if (weatherCountdown > 0) {
+    weatherCountdown -= 1;
+  } else {
+    get_weather();
+    weatherCountdown = weatherCountdownInit;
+  }
+  
+  // Draw battery state
+  static char battery_buffer[5];
+  snprintf(battery_buffer, sizeof(battery_buffer), "%02d%%", s_battery_level);
+  text_layer_set_text(s_battery_info_layer, battery_buffer);
+}
+
+// Send weather request
+static void get_weather() {
+  // Begin dictionary
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
     
@@ -152,12 +197,6 @@ void handle_timechanges(struct tm *tick_time, TimeUnits units_changed){
     
     // Send the message
     app_message_outbox_send();
-  }
-  
-  // Draw battery state
-  static char battery_buffer[5];
-  snprintf(battery_buffer, sizeof(battery_buffer), "%02d%%", s_battery_level);
-  text_layer_set_text(s_battery_info_layer, battery_buffer);
 }
 
 
@@ -177,13 +216,52 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Define which key was received
     switch(t->key){
       case KEY_TEMPERATURE:
-        snprintf(temperature_buffer, sizeof(temperature_buffer), "%dC", (int)t->value->int32);
+        if (tempC){
+          snprintf(temperature_buffer, sizeof(temperature_buffer), "%dC", (int)t->value->int32);
+        } else {
+          int tempF = (int)t->value->int32 * 1.8 + 32;
+          snprintf(temperature_buffer, sizeof(temperature_buffer), "%dF", tempF);
+        }
+        
         break;
       case KEY_CONDITIONS:
         snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
         break;
       case KEY_ERROR:
         snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
+        break;
+      case KEY_MILITARY_TIME:
+        if (t->value->int8 == 102 || t->value->int8 == 0){
+          militaryTime = false;
+          
+        } else {
+          militaryTime = true;
+        }
+      
+        persist_write_bool(KEY_MILITARY_TIME, militaryTime);
+        break;
+      case KEY_TEMPC:
+        if (t->value->int8 == 102 || t->value->int8 == 0){
+          tempC = false;
+          
+        } else {
+          tempC = true;
+        }
+
+        get_weather(); // Reread weather
+        persist_write_bool(KEY_TEMPC, tempC);
+        break;
+      case KEY_DATEDDMM:
+        if (t->value->int8 == 102 || t->value->int8 == 0){
+          dateDDMM = false;
+          
+        } else {
+          dateDDMM = true;
+        }
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Date format %d", (int)t->key);
+      
+        persist_write_bool(KEY_DATEDDMM, dateDDMM);
+        break;
       default:
         APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
     }
@@ -235,6 +313,19 @@ void init(void){
   window = window_create();
   window_set_background_color(window, GColorBlack);
   
+  // Read settings
+  if (persist_exists(KEY_MILITARY_TIME)) {
+    militaryTime = persist_read_bool(KEY_MILITARY_TIME);
+  }
+  
+  if (persist_exists(KEY_TEMPC)) {
+    tempC = persist_read_bool(KEY_TEMPC);
+  }
+  
+  if (persist_exists(KEY_DATEDDMM)) {
+    dateDDMM = persist_read_bool(KEY_DATEDDMM);
+  }
+  
   // Initialize font for time
   s_orbitron_font_36 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_36));
   s_orbitron_font_20 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_LIGHT_20));
@@ -262,13 +353,15 @@ void init(void){
   init_text_layer(&seconds_1st_layer, GRect(53, 95, 18, 20), s_orbitron_font_20);
   init_text_layer(&seconds_2nd_layer, GRect(71, 95, 18, 20), s_orbitron_font_20);
   
-  init_text_layer(&day_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
-  init_text_layer(&day_2nd_layer, GRect(24, 140, 28, 20), s_orbitron_font_20);
+  init_text_layer(&date_1st_layer, GRect(6, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&date_2nd_layer, GRect(19, 140, 28, 20), s_orbitron_font_20);
   
-  init_text_layer(&month_1st_layer, GRect(52, 140, 18, 20), s_orbitron_font_20);
-  init_text_layer(&month_2nd_layer, GRect(70, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&date_delimiter_layer, GRect(35, 140, 28, 20), s_orbitron_font_20);
+      
+  init_text_layer(&date_3rd_layer, GRect(57, 140, 18, 20), s_orbitron_font_20);
+  init_text_layer(&date_4th_layer, GRect(75, 140, 18, 20), s_orbitron_font_20);
   
-  init_text_layer(&day_of_week_layer, GRect(95, 140, 40, 20), s_orbitron_font_20);
+  init_text_layer(&day_of_week_layer, GRect(98, 140, 40, 20), s_orbitron_font_20);
 
   // Initialize weather layer
   s_weather_layer = text_layer_create(GRect(0, -2, 144, 25));
@@ -278,6 +371,7 @@ void init(void){
   text_layer_set_font(s_weather_layer, s_orbitron_font_20);
   text_layer_set_text(s_weather_layer, "Loading...");
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
+   weatherCountdown = weatherCountdownInit; // Time to re-read weather values
   
   // Initialize battery lightning
   s_battery_lightning_bmp = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_LIGHTNING);
@@ -338,13 +432,14 @@ void deinit(void){
   text_layer_destroy(minutes_2nd_layer);
   text_layer_destroy(seconds_1st_layer);
   text_layer_destroy(seconds_2nd_layer);
-  text_layer_destroy(day_1st_layer);
-  text_layer_destroy(day_2nd_layer);
-  text_layer_destroy(month_1st_layer);
-  text_layer_destroy(month_2nd_layer);
+  text_layer_destroy(date_1st_layer);
+  text_layer_destroy(date_2nd_layer);
+  text_layer_destroy(date_3rd_layer);
+  text_layer_destroy(date_4th_layer);
   text_layer_destroy(day_of_week_layer);
   text_layer_destroy(s_weather_layer);
   text_layer_destroy(s_battery_info_layer);
+  text_layer_destroy(date_delimiter_layer);
   
   // Destroy graphics
   gbitmap_destroy(s_time_angles_bmp);
